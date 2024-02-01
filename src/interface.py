@@ -4,6 +4,7 @@ import random
 from Action.movement import Movement
 from Entities.player import Player
 from Requests.request import Request
+import json
 
 class Interface:
     def __init__(self):
@@ -13,10 +14,14 @@ class Interface:
         self.request = Request()
         # We get the world instance (the size of the window)
         self.world=self.request.get("world")
+        print("######################")
+        print(self.world)
+        print("######################")
+        
         # We request the local player to the server (the player that we control)
         # We get a player instance
-        self.local_player=self.request.get("/world/connect")
-        self.screen = pygame.display.set_mode((800, 600))
+        self.local_player=self.request.get("world/join")
+        self.screen = pygame.display.set_mode((self.world['y_dim'], self.world['x_dim']))
         self.clock = pygame.time.Clock()
         self.running = True
     
@@ -28,7 +33,10 @@ class Interface:
         self.player = Player(self.player_pos,pygame,self.request)
         
         # Init players (we get player instances)
-        #self.players = self.request.get("/world/players")
+        self.players = self.request.get("player")
+        print("######################")
+        print(type(self.players.text))
+        print("######################")
         # Before the server is implemented, we create a list of players to test the interface
         self.players = [Player(pygame.Vector2(100,100),pygame,self.request),Player(pygame.Vector2(200,200),pygame,self.request),self.player]
             

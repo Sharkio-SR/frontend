@@ -1,15 +1,17 @@
 import requests
+import json
 
 class Request:
     def __init__(self):
         self.session = requests.Session()
         # We put this url to listen our requests
-        self.url = "https://eoqleo2r6vceqqa.m.pipedream.net?"
+        self.url = "http://sharkio.istic.univ-rennes1.fr:8080/"
         
     # Each method is a implementation of a HTTP method
     def get(self, path):
         print("get :"+self.url + path)
-        return self.session.get(self.url + path)
+        self.data=json.loads(self.session.get(self.url + path).text)
+        return(self.data)
     
     def post(self, path, data):
         print("post :"+self.url + path)
