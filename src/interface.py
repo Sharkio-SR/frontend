@@ -35,10 +35,10 @@ class Interface:
         # Init players (we get player instances)
         self.players = self.request.get("player")
         print("######################")
-        print(type(self.players.text))
+        print(self.players)
         print("######################")
         # Before the server is implemented, we create a list of players to test the interface
-        self.players = [Player(pygame.Vector2(100,100),pygame,self.request),Player(pygame.Vector2(200,200),pygame,self.request),self.player]
+        #self.players = [Player(pygame.Vector2(100,100),pygame,self.request),Player(pygame.Vector2(200,200),pygame,self.request),self.player]
             
         while self.running:
             # Events
@@ -51,24 +51,26 @@ class Interface:
             self.screen.fill("white")
             
             # Draw Player
-            self.player.draw(self.screen)
+            #self.player.draw(self.screen)
 
             # Movement
-            movement = Movement(self.player.get_pos(),pygame,self.request,self.player.get_id())
+            movement = Movement(self.local_player.get_pos(),pygame,self.request,self.player.get_id())
             movement.move(self.clock.tick(60) / 1000)
-            self.players[2]=self.player
+            #self.players[2]=self.player
             
             #Update and check roleback
-            #self.players = self.request.get("/world/players")
+            self.players = self.request.get("/world/players")
             for player in self.players:
                 # We check if the player is the local player
-                if player.get_id() != self.player.get_id():
+                if player.get_id() == self.local_player.get_id():
                     # We check if the position of the player is the same as the local player
                     # If not, it means that the server has rollback the player
                     if player.get_pos().x != self.player.get_pos().x or player.get_pos().y != self.player.get_pos().y:
                         self.player_pos=player.get_pos()
                 # We draw the player
-                player.draw(self.screen)
+                    player.draw(self.screen,"blue")
+                else:
+                    player.draw(self.screen)
                     
                         
             

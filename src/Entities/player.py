@@ -8,9 +8,9 @@ class Player:
         self.request_instance = request_instance
         self.request_instance.post("player",{"x":self.player_pos.x,"y":self.player_pos.y})
 
-    def draw(self, screen):
+    def draw(self, screen,color="red"):
         # This function draw the player on the screen with a circle
-        self.pygame_instance.draw.circle(screen, "red", self.player_pos, 40)
+        self.pygame_instance.draw.circle(screen, color, self.player_pos, 15)
         
     def get_id(self):
         #Return the id of the player
