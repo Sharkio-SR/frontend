@@ -9,7 +9,7 @@ class Request:
         
     # Each method is a implementation of a HTTP method
     def get(self, path):
-        print("get :"+self.url + path)
+        #print("get :"+self.url + path)
         self.data=json.loads(self.session.get(self.url + path).text)
         return(self.data)
     

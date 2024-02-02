@@ -4,9 +4,10 @@
 
 #Class for the movement of the player
 class Movement:
-    def __init__(self, player_pos, pygame_instance,request_instance,id_player):
+    def __init__(self, player_pos_x,player_pos_y, pygame_instance,request_instance,id_player):
         self.request_instance = request_instance
-        self.player_pos = player_pos
+        self.player_pos_x = player_pos_x
+        self.player_pos_y = player_pos_y
         self.pygame_instance = pygame_instance
         self.id_player = id_player
 
@@ -16,14 +17,19 @@ class Movement:
         # We send the new position of the player to the server
         keys = self.pygame_instance.key.get_pressed()
         if keys[self.pygame_instance.K_z]:
-            self.request_instance.put(self.id_player,{"x":self.player_pos.x,"y":self.player_pos.y-300*dt})
-            self.player_pos.y -= 300 * dt
+            data={'newX':self.player_pos_x,'newY':(self.player_pos_y-300*dt)}
+            self.request_instance.put("player/"+str(self.id_player)+"/move",data)
+            self.player_pos_y -= 300 * dt
         if keys[self.pygame_instance.K_s]:
-            self.request_instance.put(self.id_player,{"x":self.player_pos.x,"y":self.player_pos.y+300*dt})
-            self.player_pos.y += 300 * dt
+            data={'newX':self.player_pos_x,'newY':(self.player_pos_y+300*dt)}
+            self.request_instance.put("player/"+str(self.id_player)+"/move",data)
+            self.player_pos_y += 300 * dt
         if keys[self.pygame_instance.K_q]:
-            self.request_instance.put(self.id_player,{"x":self.player_pos.x-300*dt,"y":self.player_pos.y})
-            self.player_pos.x -= 300 * dt
+            data={'newX':(self.player_pos_x-300*dt),'newY':self.player_pos_y}
+            self.request_instance.put("player/"+str(self.id_player)+"/move",data)
+            self.player_pos_x -= 300 * dt
         if keys[self.pygame_instance.K_d]:
-            self.request_instance.put(self.id_player,{"x":self.player_pos.x+300*dt,"y":self.player_pos.y})
-            self.player_pos.x += 300 * dt
+            data={'newX':(self.player_pos_x+300*dt),'newY':self.player_pos_y}
+            self.request_instance.put("player/"+str(self.id_player)+"/move",data)
+            self.player_pos_x += 300 * dt
+        
