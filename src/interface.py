@@ -45,7 +45,7 @@ class Interface:
         #print("######################")
         #print(self.players)
         #print("######################")
-        
+        self.local_player.draw(self.screen,"blue")
         # Before the server is implemented, we create a list of players to test the interface
         #self.players = [Player(pygame.Vector2(100,100),pygame,self.request),Player(pygame.Vector2(200,200),pygame,self.request),self.player]
             
@@ -58,9 +58,6 @@ class Interface:
 
             # Update
             self.screen.fill("white")
-            self.local_player.draw(self.screen,"blue")
-            # Draw Player
-            #self.player.draw(self.screen)
             
             #Update and check roleback
             self.players = self.request.get("player")
