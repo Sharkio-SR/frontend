@@ -1,21 +1,34 @@
 #Class for the player
 class Player:
-    def __init__(self, player_pos, pygame_instance, request_instance):
+    def __init__(self, id,pos_x,pos_y, pygame_instance, request_instance):
         # We init the player with a position, a pygame instance and a request instance
-        self.id_player = 0
-        self.player_pos = player_pos
+        self.id_player = id
+        self.pos_x = pos_x
+        self.pos_y = pos_y
         self.pygame_instance = pygame_instance
         self.request_instance = request_instance
-        self.request_instance.post("player",{"x":self.player_pos.x,"y":self.player_pos.y})
 
-    def draw(self, screen):
+    def draw(self, screen,color="red"):
         # This function draw the player on the screen with a circle
-        self.pygame_instance.draw.circle(screen, "red", self.player_pos, 40)
+        self.player_pos=(self.pos_x,self.pos_y)
+        self.pygame_instance.draw.circle(screen, color, self.player_pos, 15)
         
     def get_id(self):
         #Return the id of the player
         return self.id_player
     
-    def get_pos(self):
+    def get_pos_x(self):
         #Return the position of the player
-        return self.player_pos
+        return self.pos_x
+    
+    def get_pos_y(self):
+        #Return the position of the player
+        return self.pos_y
+    
+    def set_pos_x(self, new_pos_x):
+        #Set the position of the player
+        self.pos_x = new_pos_x
+    
+    def set_pos_y(self, new_pos_y):
+        #Set the position of the player
+        self.pos_y = new_pos_y
