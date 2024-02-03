@@ -24,3 +24,11 @@ class Player:
     def get_pos_y(self):
         #Return the position of the player
         return self.pos_y
+    
+    def set_pos_x(self, new_pos_x):
+        #Set the position of the player
+        self.pos_x = new_pos_x
+    
+    def set_pos_y(self, new_pos_y):
+        #Set the position of the player
+        self.pos_y = new_pos_y

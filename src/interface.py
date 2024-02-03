@@ -36,18 +36,9 @@ class Interface:
         
 
     def run(self):
-        # Init player (temporary)
-        #self.player_pos = pygame.Vector2(random.randint(0, self.screen.get_width()), random.randint(0, self.screen.get_height()))
-        #self.player = Player(self.player_pos,pygame,self.request)
         
-        # Init players (we get player instances)
-        #self.players = self.request.get("player")
-        #print("######################")
-        #print(self.players)
-        #print("######################")
+        # Init players (we draw local_player)
         self.local_player.draw(self.screen,"blue")
-        # Before the server is implemented, we create a list of players to test the interface
-        #self.players = [Player(pygame.Vector2(100,100),pygame,self.request),Player(pygame.Vector2(200,200),pygame,self.request),self.player]
             
         while self.running:
             # Events
@@ -62,29 +53,31 @@ class Interface:
             #Update and check roleback
             self.players = self.request.get("player")
             
-            # Movement
-            movement = Movement(self.local_player.get_pos_x(),self.local_player.get_pos_y(),pygame,self.request,self.local_player.get_id())
-            movement.move(self.clock.tick(60) / 1000)
-            #self.players[2]=self.player
-            
             for player in self.players:
                 player = Player(player['id'],player['pos_x'],player['pos_y'],pygame,self.request)
                 # We check if the player is the local player
                 if player.get_id() == self.local_player.get_id():
-                    print("Passe")
                     # We check if the position of the player is the same as the local player
                     # If not, it means that the server has rollback the player
                     if player.get_pos_x() != self.local_player.get_pos_x() or player.get_pos_y() != self.local_player.get_pos_y():
                         self.local_player.pos_x=player.get_pos_x()
                         self.local_player.pos_y=player.get_pos_y()
+                # We move the player
+                    keys = pygame.key.get_pressed()
+                    if any(key !=0 for key in keys):
+                        movement = Movement(player.get_pos_x(),player.get_pos_y(),pygame,self.request,player.get_id())
+                        movement.move(self.clock.tick(60) / 1000,keys)
                 # We draw the player
                     player.draw(self.screen,"blue")
                 else:
                     player.draw(self.screen)
+                
+                if (player.get_id() == self.local_player.get_id()):
+                    
+                    player.draw(self.screen,"blue")
+                else:    
+                    player.draw(self.screen)
                 del player
-            
-            
-                        
             
             # Flip
             pygame.display.flip()
