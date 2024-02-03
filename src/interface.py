@@ -71,12 +71,7 @@ class Interface:
                     player.draw(self.screen,"blue")
                 else:
                     player.draw(self.screen)
-                
-                if (player.get_id() == self.local_player.get_id()):
-                    
-                    player.draw(self.screen,"blue")
-                else:    
-                    player.draw(self.screen)
+                # We delete the player instance
                 del player
             
             # Flip
