@@ -45,6 +45,7 @@ class Interface:
             # pygame.QUIT event means the user clicked X to close your window
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
+                    self.request.delete("player/"+str(self.local_player.get_id()))
                     self.running = False
 
             # Update
