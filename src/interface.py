@@ -20,25 +20,28 @@ class Interface:
         print(self.world)
         print("######################")
         
-        # We request the local player to the server (the player that we control)
+        self.screen = pygame.display.set_mode((self.world['y_dim']+50, self.world['x_dim']))
+        self.font = pygame.font.Font(None, 36)
+        self.clock = pygame.time.Clock()
+        self.running = True
+        
+                # We request the local player to the server (the player that we control)
         # We get a player instance
         self.initplayer=self.request.get("world/join")
-        self.local_player=Player(self.initplayer['id'],self.initplayer['pos_x'],self.initplayer['pos_y'],pygame,self.request)
+        self.local_player=Player(self.initplayer['id'],self.initplayer['pos_x'],self.initplayer['pos_y'],pygame,self.request,self.screen)
         print("######################")
         print(self.initplayer)
         print("######################")
-        
-        
-        self.screen = pygame.display.set_mode((self.world['y_dim'], self.world['x_dim']))
-        self.clock = pygame.time.Clock()
-        self.running = True
     
         
 
     def run(self):
         
+        background_image = pygame.image.load("src/Image/background.png")  # Remplacez "background.jpg" par le chemin de votre image
+        background_image = pygame.transform.scale(background_image, (600, 600))  # Redimensionner l'image de fond à la taille de la fenêtre
+        
         # Init players (we draw local_player)
-        self.local_player.draw(self.screen,"blue")
+        self.local_player.draw(self.screen,"dark")
             
         while self.running:
             # Events
@@ -49,13 +52,14 @@ class Interface:
                     self.running = False
 
             # Update
-            self.screen.fill("white")
+            self.screen.fill("grey")
+            self.screen.blit(background_image, (0, 0))
             
             #Update and check roleback
             self.players = self.request.get("player")
             
             for player in self.players:
-                player = Player(player['id'],player['pos_x'],player['pos_y'],pygame,self.request)
+                player = Player(player['id'],player['pos_x'],player['pos_y'],pygame,self.request,self.screen)
                 # We check if the player is the local player
                 if player.get_id() == self.local_player.get_id():
                     # We check if the position of the player is the same as the local player

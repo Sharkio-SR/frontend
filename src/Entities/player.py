@@ -1,17 +1,34 @@
 #Class for the player
 class Player:
-    def __init__(self, id,pos_x,pos_y, pygame_instance, request_instance):
+    def __init__(self, id,pos_x,pos_y, pygame_instance, request_instance, screen):
         # We init the player with a position, a pygame instance and a request instance
         self.id_player = id
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.pygame_instance = pygame_instance
+        self.screen_instance=screen
         self.request_instance = request_instance
+        self.image_player = self.pygame_instance.image.load("src/Image/sharkplayer.png")
+        self.image_player = self.pygame_instance.transform.scale(self.image_player, (60, 60))
+        self.player_rect=self.image_player.get_rect()
+        self.image_opponent = self.pygame_instance.image.load("src/Image/sharkopp.png")
+        self.image_opponent = self.pygame_instance.transform.scale(self.image_opponent, (60, 60))
+        self.opponent_rect=self.image_opponent.get_rect()
+        #Image player
+        
 
     def draw(self, screen,color="red"):
         # This function draw the player on the screen with a circle
-        self.player_pos=(self.pos_x,self.pos_y)
-        self.pygame_instance.draw.circle(screen, color, self.player_pos, 15)
+        self.player_rect.x = self.pos_x
+        self.player_rect.y = self.pos_y
+        if(color=="blue"):
+            self.player_rect.x = self.pos_x
+            self.player_rect.y = self.pos_y
+            self.screen_instance.blit(self.image_player,self.player_rect)
+        else:
+            self.opponent_rect.x = self.pos_x
+            self.opponent_rect.y = self.pos_y
+            self.screen_instance.blit(self.image_opponent,self.opponent_rect)
         
     def get_id(self):
         #Return the id of the player
