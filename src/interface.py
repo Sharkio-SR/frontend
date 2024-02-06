@@ -3,11 +3,21 @@ import pygame
 import random
 from Action.movement import Movement
 from Entities.player import Player
+from Entities.fish import Fish
 from Requests.request import Request
 import json
 
 class Interface:
+    def instanciation_fish(self,fishs):
+        # This function instanciate the fishs and put it in a list to save their images
+        List_fish=[]
+        images=["fish1.png","fish2.png","fish3.png","fish4.png","fish5.png","fish6.png","fish7.png","fish8.png"]
+        for fish in fishs:
+            fish = Fish(fish['id'],fish['pos_x'],fish['pos_y'],images[random.randint(0,7)],pygame,self.screen)
+            List_fish.append(fish)
+        return List_fish
         
+            
         
     def __init__(self):
         # Init pygame and window size 
@@ -25,7 +35,11 @@ class Interface:
         self.clock = pygame.time.Clock()
         self.running = True
         
-                # We request the local player to the server (the player that we control)
+        #We request the fishs(food) to the server
+        self.foods=self.request.get("food")
+        self.list_fishs=self.instanciation_fish(self.foods)
+        
+        # We request the local player to the server (the player that we control)
         # We get a player instance
         self.initplayer=self.request.get("world/join")
         self.local_player=Player(self.initplayer['id'],self.initplayer['pos_x'],self.initplayer['pos_y'],pygame,self.request,self.screen)
@@ -37,8 +51,8 @@ class Interface:
 
     def run(self):
         
-        background_image = pygame.image.load("src/Image/background.png")  # Remplacez "background.jpg" par le chemin de votre image
-        background_image = pygame.transform.scale(background_image, (600, 600))  # Redimensionner l'image de fond à la taille de la fenêtre
+        background_image = pygame.image.load("src/Images/background.png")
+        background_image = pygame.transform.scale(background_image, (600, 600))
         
         # Init players (we draw local_player)
         self.local_player.draw(self.screen,"dark")
@@ -54,6 +68,11 @@ class Interface:
             # Update
             self.screen.fill("grey")
             self.screen.blit(background_image, (0, 0))
+            
+            # Update the food and draw it
+            foods=self.request.get("food")
+            for food in foods:
+                next(filter(lambda fish: fish.id_fish == food['id'], self.list_fishs), None).draw()
             
             #Update and check roleback
             self.players = self.request.get("player")
@@ -71,7 +90,7 @@ class Interface:
                     keys = pygame.key.get_pressed()
                     if any(key !=0 for key in keys):
                         movement = Movement(player.get_pos_x(),player.get_pos_y(),pygame,self.request,player.get_id())
-                        movement.move(self.clock.tick(60) / 1000,keys)
+                        movement.move(self.clock.tick(120) / 1000,keys)
                 # We draw the player
                     player.draw(self.screen,"blue")
                 else:
@@ -81,7 +100,7 @@ class Interface:
             
             # Flip
             pygame.display.flip()
-            self.clock.tick(60)
+            self.clock.tick(120)
         self.request.close()
         pygame.quit()
 

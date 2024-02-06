@@ -8,10 +8,10 @@ class Player:
         self.pygame_instance = pygame_instance
         self.screen_instance=screen
         self.request_instance = request_instance
-        self.image_player = self.pygame_instance.image.load("src/Image/sharkplayer.png")
+        self.image_player = self.pygame_instance.image.load("src/Images/sharkplayer.png")
         self.image_player = self.pygame_instance.transform.scale(self.image_player, (60, 60))
         self.player_rect=self.image_player.get_rect()
-        self.image_opponent = self.pygame_instance.image.load("src/Image/sharkopp.png")
+        self.image_opponent = self.pygame_instance.image.load("src/Images/sharkopp.png")
         self.image_opponent = self.pygame_instance.transform.scale(self.image_opponent, (60, 60))
         self.opponent_rect=self.image_opponent.get_rect()
         #Image player
