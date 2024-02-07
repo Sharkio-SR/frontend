@@ -5,7 +5,7 @@ class Request:
     def __init__(self):
         self.session = requests.Session()
         # We put this url to listen our requests
-        self.url = "http://localhost:8080/"
+        self.url = "http://sharkio.istic.univ-rennes1.fr:8080/"
         
     # Each method is a implementation of a HTTP method
     def get(self, path):
