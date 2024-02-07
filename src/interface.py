@@ -11,7 +11,7 @@ class Interface:
     
     def instanciation_player(self,screen,username):
         initplayer = self.request.post("world/join", {"name": username})
-        self.local_player = Player(initplayer['id'], initplayer['pos_x'], initplayer['pos_y'], pygame, self.request, screen)
+        self.local_player = Player(initplayer['id'], initplayer['pos_x'], initplayer['pos_y'], username, pygame, self.request, screen)
          
     
     def instanciation_fish(self,fishs,screen):
@@ -26,9 +26,9 @@ class Interface:
     def function_listscores(self,scores,font,screen): 
         # We sort the list of score
         y=50
-        list_scores=sorted(scores,key=lambda x: x[1], reverse=True)[:10]    # We only display the 10 first scores
+        list_scores=sorted(scores,key=lambda x: x[2], reverse=True)[:10]    # We only display the 10 first scores
         for score in list_scores:
-            text_surface = font.render(f"Joueur {score[0]} : {score[1]}", True, "black")
+            text_surface = font.render(f"Joueur {score[1]} : {score[2]}", True, "black")
             screen.blit(text_surface, (630, y))
             y += 30
             
@@ -118,8 +118,8 @@ class Interface:
             #Update and check roleback
             players = self.request.get("player")
             for player in players:
-                scores.append((player['id'],player['score']))
-                player = Player(player['id'],player['pos_x'],player['pos_y'],pygame,self.request,screen)       
+                scores.append([player['id'],player['name'],player['score']])
+                player = Player(player['id'],player['pos_x'],player['pos_y'],player['name'],pygame,self.request,screen)       
                 # We check if the player is the local player
                 if player.get_id() == self.local_player.get_id():
                     # We check if the position of the player is the same as the local player
@@ -162,7 +162,6 @@ class Interface:
     
     def run(self):
         username = self.popup_username()
-        print(username)
         if(username!=None):
             self.game(username)
         else:
