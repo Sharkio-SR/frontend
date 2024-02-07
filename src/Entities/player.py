@@ -24,11 +24,11 @@ class Player:
         if(color=="blue"):
             self.player_rect.x = self.pos_x
             self.player_rect.y = self.pos_y
-            self.screen_instance.blit(self.image_player,self.player_rect)
+            self.screen_instance.blit(self.image_player,(self.player_rect.x-30,self.player_rect.y-30))
         else:
             self.opponent_rect.x = self.pos_x
             self.opponent_rect.y = self.pos_y
-            self.screen_instance.blit(self.image_opponent,self.opponent_rect)
+            self.screen_instance.blit(self.image_opponent,(self.opponent_rect.x-30,self.opponent_rect.y-30))
         
     def get_id(self):
         #Return the id of the player

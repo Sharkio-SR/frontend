@@ -26,11 +26,8 @@ class Interface:
         self.request = Request()
         # We get the world instance (the size of the window)
         self.world=self.request.get("world")
-        print("######################")
-        print(self.world)
-        print("######################")
         
-        self.screen = pygame.display.set_mode((self.world['y_dim']+50, self.world['x_dim']))
+        self.screen = pygame.display.set_mode((self.world['y_dim']+250, self.world['x_dim']+50))
         self.font = pygame.font.Font(None, 36)
         self.clock = pygame.time.Clock()
         self.running = True
@@ -43,9 +40,6 @@ class Interface:
         # We get a player instance
         self.initplayer=self.request.get("world/join")
         self.local_player=Player(self.initplayer['id'],self.initplayer['pos_x'],self.initplayer['pos_y'],pygame,self.request,self.screen)
-        print("######################")
-        print(self.initplayer)
-        print("######################")
     
         
 
@@ -76,9 +70,10 @@ class Interface:
             
             #Update and check roleback
             self.players = self.request.get("player")
-            
+            scores=[]
             for player in self.players:
-                player = Player(player['id'],player['pos_x'],player['pos_y'],pygame,self.request,self.screen)
+                scores.append((player['id'],player['score']))
+                player = Player(player['id'],player['pos_x'],player['pos_y'],pygame,self.request,self.screen)       
                 # We check if the player is the local player
                 if player.get_id() == self.local_player.get_id():
                     # We check if the position of the player is the same as the local player
@@ -97,6 +92,14 @@ class Interface:
                     player.draw(self.screen)
                 # We delete the player instance
                 del player
+            
+            # We sort the list of score
+            y=50
+            list_scores=sorted(scores,key=lambda x: x[1], reverse=True)
+            for score in list_scores:
+                text_surface = self.font.render(f"Joueur {score[0]} : {score[1]}", True, "black")
+                self.screen.blit(text_surface, (630, y))
+                y += 30
             
             # Flip
             pygame.display.flip()

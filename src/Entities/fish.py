@@ -11,15 +11,19 @@ class Fish:
         self.pygame_instance = pygame
         self.screen_instance=screen
         self.image_fish = self.pygame_instance.image.load("src/Images/"+image)
-        self.image_fish = self.pygame_instance.transform.scale(self.image_fish, (40, 40))
+        self.image_fish = self.pygame_instance.transform.scale(self.image_fish, (20, 20))
     
     def draw(self):
         # We draw the fish on the screen
-        self.fish_rect=self.image_fish.get_rect()
-        self.fish_rect.x = self.pos_x
-        self.fish_rect.y = self.pos_y
-        self.screen_instance.blit(self.image_fish,self.fish_rect)
-        
+        #self.fish_rect=self.image_fish.get_rect()
+        #self.fish_rect.x = self.pos_x
+        #self.fish_rect.y = self.pos_y
+        self.screen_instance.blit(self.image_fish,(self.pos_x-10,self.pos_y-10))
+    
+    def draw_circle(self, color):
+        # We draw a circle around the fish
+        self.pygame_instance.draw.circle(self.screen_instance, color, (self.pos_x, self.pos_y), 10, 2)
+    
     def find_fish_by_id(fish_list, target_id):
         for fish in fish_list:
             if fish.id == target_id:
