@@ -26,7 +26,7 @@ class Interface:
     def function_listscores(self,scores,font,screen): 
         # We sort the list of score
         y=50
-        list_scores=sorted(scores,key=lambda x: x[1], reverse=True)
+        list_scores=sorted(scores,key=lambda x: x[1], reverse=True)[:10]    # We only display the 10 first scores
         for score in list_scores:
             text_surface = font.render(f"Joueur {score[0]} : {score[1]}", True, "black")
             screen.blit(text_surface, (630, y))
