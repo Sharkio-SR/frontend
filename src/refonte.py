@@ -8,28 +8,24 @@ from Requests.request import Request
 import json
 
 class Interface:
-    
-    def instanciation_player(self,screen,username):
-        initplayer = self.request.post("world/join", {"name": username})
-        self.local_player = Player(initplayer['id'], initplayer['pos_x'], initplayer['pos_y'], pygame, self.request, screen)
          
     
-    def instanciation_fish(self,fishs,screen):
+    def instanciation_fish(self,fishs):
         # This function instanciate the fishs and put it in a list to save their images
         List_fish=[]
         images=["fish1.png","fish2.png","fish3.png","fish4.png","fish5.png","fish6.png","fish7.png","fish8.png"]
         for fish in fishs:
-            fish = Fish(fish['id'],fish['pos_x'],fish['pos_y'],images[random.randint(0,7)],pygame,screen)
+            fish = Fish(fish['id'],fish['pos_x'],fish['pos_y'],images[random.randint(0,7)],pygame,self.screen)
             List_fish.append(fish)
         return List_fish
     
-    def function_listscores(self,scores,font,screen): 
+    def function_listscores(self,scores): 
         # We sort the list of score
         y=50
         list_scores=sorted(scores,key=lambda x: x[1], reverse=True)
         for score in list_scores:
-            text_surface = font.render(f"Joueur {score[0]} : {score[1]}", True, "black")
-            screen.blit(text_surface, (630, y))
+            text_surface = self.font.render(f"Joueur {score[0]} : {score[1]}", True, "black")
+            self.screen.blit(text_surface, (630, y))
             y += 30
             
     
@@ -38,15 +34,12 @@ class Interface:
         # We use the username to create the player instance
         # We send the username to the server
         pygame.init()
-        screen = pygame.display.set_mode((400, 200))
-        pygame.display.set_caption("Zone d'input avec Pygame")
-        # Définition des constantes pour les dimensions et les positions des éléments
-        input_box = pygame.Rect(75, 50, 250, 30)
-        button = pygame.Rect(150, 100, 100, 50)
+        self.screen = pygame.display.set_mode((300, 200))
         font = pygame.font.Font(None, 36)
         clock = pygame.time.Clock()
         running = True
         username = ""
+        button_text = 'Valider'
         while running:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -56,6 +49,7 @@ class Interface:
                     if event.key == pygame.K_RETURN:
                         running = False
                         if username != "":
+                            print("username : ", username)
                             return username
                         else:
                             return None
@@ -65,35 +59,22 @@ class Interface:
                         username += event.unicode
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if button.collidepoint(event.pos):
+                        print("Texte saisi :", username)
                         return username
             screen.fill("white")
-            pygame.draw.rect(screen, 'black', input_box, 2)
-            pygame.draw.rect(screen, 'black', button, 2)
-            # Afficher le texte saisi dans la zone d'input
-            text_surface = font.render(username, True, 'black')
-            screen.blit(text_surface, (input_box.x + 5, input_box.y + 5))
-
-            # Afficher le texte du bouton
-            
-            button_text = font.render("Valider", True, 'black')
-            text_width, text_height = font.size("Valider")
-            text_x = button.x + (button.width - text_width) // 2
-            text_y = button.y + (button.height - text_height) // 2
-            screen.blit(button_text, (text_x, text_y))
+            text_surface = font.render(username, True, "black")
+            screen.blit(text_surface, (50, 50))
             pygame.display.flip()
             clock.tick(30)
         pygame.quit()
     
     
-    def game(self,username):
+    def game(self):
         pygame.init()
-        clock = pygame.time.Clock()
         screen=pygame.display.set_mode((self.world['y_dim']+250, self.world['x_dim']+50))
-        list_fishs=self.instanciation_fish(self.request.get("food"),screen)
-        font=pygame.font.Font(None, 36)
+        list_fishs=self.instanciation_fish(self.request.get("food"))
         # Init players (we draw local_player)
-        self.instanciation_player(screen,username)
-        self.local_player.draw(screen,"dark")
+        self.local_player.draw(self.screen,"dark")
         running=True
         background_image = pygame.image.load("src/Images/background.png")
         background_image = pygame.transform.scale(background_image, (600, 600))
@@ -103,7 +84,7 @@ class Interface:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     self.request.delete("player/"+str(self.local_player.get_id()))
-                    running = False
+                    self.running = False
 
             # Update
             screen.fill("grey")
@@ -131,7 +112,7 @@ class Interface:
                     keys = pygame.key.get_pressed()
                     if any(key !=0 for key in keys):
                         movement = Movement(player.get_pos_x(),player.get_pos_y(),pygame,self.request,player.get_id())
-                        movement.move(clock.tick(120) / 1000,keys)
+                        movement.move(self.clock.tick(120) / 1000,keys)
                 # We draw the player
                     player.draw(screen,"blue")
                 else:
@@ -140,11 +121,11 @@ class Interface:
                 del player
             
             # We draw the score
-            self.function_listscores(scores,font,screen)
+            self.function_listscores()
             
             # Flip
             pygame.display.flip()
-            clock.tick(120)
+            self.clock.tick(120)
         self.request.close()
         pygame.quit()
         
@@ -154,6 +135,7 @@ class Interface:
         # We request the world to the server
         
         self.request = Request()
+        self.screen = self.init_screen()
         # We get the world instance (the size of the window)
         self.clock = pygame.time.Clock()
         self.world=self.request.get("world")
@@ -162,10 +144,13 @@ class Interface:
     
     def run(self):
         username = self.popup_username()
-        print(username)
-        if(username!=None):
-            self.game(username)
+        if(self.local_player!=None):
+            initplayer = self.request.get("world/join")
+            self.local_player = Player(initplayer['id'], initplayer['pos_x'], initplayer['pos_y'], pygame, self.request, self.screen)
+            self.game()
         else:
             self.request.close()
+
+            
 
     
