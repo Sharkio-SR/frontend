@@ -10,10 +10,10 @@ class Player:
         self.screen_instance=screen
         self.request_instance = request_instance
         self.image_player = self.pygame_instance.image.load("src/Images/sharkplayer.png")
-        self.image_player = self.pygame_instance.transform.scale(self.image_player, (60, 40))
+        self.image_player = self.pygame_instance.transform.scale(self.image_player, (60, 34))
         self.player_rect=self.image_player.get_rect()
         self.image_opponent = self.pygame_instance.image.load("src/Images/sharkopp.png")
-        self.image_opponent = self.pygame_instance.transform.scale(self.image_opponent, (60, 40))
+        self.image_opponent = self.pygame_instance.transform.scale(self.image_opponent, (60, 34))
         self.opponent_rect=self.image_opponent.get_rect()
         #Image player
         
@@ -25,11 +25,11 @@ class Player:
         if(color=="blue"):
             self.player_rect.x = self.pos_x
             self.player_rect.y = self.pos_y
-            self.screen_instance.blit(self.image_player,(self.player_rect.x-30,self.player_rect.y-20))
+            self.screen_instance.blit(self.image_player,(self.player_rect.x-30,self.player_rect.y-17))
         else:
             self.opponent_rect.x = self.pos_x
             self.opponent_rect.y = self.pos_y
-            self.screen_instance.blit(self.image_opponent,(self.opponent_rect.x-30,self.opponent_rect.y-20))
+            self.screen_instance.blit(self.image_opponent,(self.opponent_rect.x-30,self.opponent_rect.y-17))
         
     def get_id(self):
         #Return the id of the player
