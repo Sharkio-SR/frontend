@@ -18,14 +18,16 @@ class Player:
         #Image player
         
 
-    def draw(self, screen,color="red"):
+    def draw(self, screen,color="red",reverse=False):
         # This function draw the player on the screen with a circle
         self.player_rect.x = self.pos_x
         self.player_rect.y = self.pos_y
+        flipped_image_vertical = self.image_player
         if(color=="blue"):
             self.player_rect.x = self.pos_x
             self.player_rect.y = self.pos_y
-            self.screen_instance.blit(self.image_player,(self.player_rect.x-30,self.player_rect.y-17))
+            flipped_image_vertical = self.pygame_instance.transform.flip(self.image_player, reverse, False)
+            self.screen_instance.blit(flipped_image_vertical,(self.player_rect.x-30,self.player_rect.y-17))
         else:
             self.opponent_rect.x = self.pos_x
             self.opponent_rect.y = self.pos_y
@@ -43,6 +45,7 @@ class Player:
         #Return the position of the player
         return self.pos_y
     
+    
     def set_pos_x(self, new_pos_x):
         #Set the position of the player
         self.pos_x = new_pos_x
@@ -50,3 +53,4 @@ class Player:
     def set_pos_y(self, new_pos_y):
         #Set the position of the player
         self.pos_y = new_pos_y
+        

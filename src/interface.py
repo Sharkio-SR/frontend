@@ -43,7 +43,7 @@ class Interface:
         # Définition des constantes pour les dimensions et les positions des éléments
         input_box = pygame.Rect(75, 50, 250, 30)
         button = pygame.Rect(150, 100, 100, 50)
-        font = pygame.font.Font(None, 36)
+        font = pygame.font.Font(None, 26)
         clock = pygame.time.Clock()
         running = True
         username = ""
@@ -128,12 +128,17 @@ class Interface:
                         self.local_player.pos_x=player.get_pos_x()
                         self.local_player.pos_y=player.get_pos_y()
                 # We move the player
+                    movement=None
                     keys = pygame.key.get_pressed()
                     if any(key !=0 for key in keys):
                         movement = Movement(player.get_pos_x(),player.get_pos_y(),pygame,self.request,player.get_id())
                         movement.move(clock.tick(120) / 1000,keys)
+                        
                 # We draw the player
-                    player.draw(screen,"blue")
+                    if(movement!=None):
+                        player.draw(screen,"blue",movement.reverse)
+                    else:
+                        player.draw(screen,"blue")
                 else:
                     player.draw(screen)
                 # We delete the player instance
@@ -166,5 +171,3 @@ class Interface:
             self.game(username)
         else:
             self.request.close()
-
-    
