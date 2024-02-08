@@ -45,7 +45,9 @@ class Interface:
         # We send the username to the server
         pygame.init()
         screen = pygame.display.set_mode((400, 200))
-        pygame.display.set_caption("Zone d'input avec Pygame")
+        pygame.display.set_caption("Enter Username")
+        background_image = pygame.image.load("src/Images/Enter.png")
+        background_image = pygame.transform.scale(background_image, (400, 200))
         # Définition des constantes pour les dimensions et les positions des éléments
         input_box = pygame.Rect(75, 50, 250, 30)
         button = pygame.Rect(150, 100, 100, 50)
@@ -72,16 +74,22 @@ class Interface:
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if button.collidepoint(event.pos):
                         return username
-            screen.fill("white")
-            pygame.draw.rect(screen, 'black', input_box, 2)
-            pygame.draw.rect(screen, 'black', button, 2)
+            screen.blit(background_image, (0, 0))
+            # Dessiner la bordure de la zone d'input en noir
+            pygame.draw.rect(screen, (0, 0, 0), input_box, 2)
+            # Remplir l'intérieur de la zone d'input en blanc
+            pygame.draw.rect(screen, (211,211,211), input_box)
+            # Dessiner la bordure du bouton en noir
+            pygame.draw.rect(screen, (0, 0, 0), button, 2)
+            # Remplir l'intérieur du bouton en blanc
+            pygame.draw.rect(screen, (211,211,211), button)
             # Afficher le texte saisi dans la zone d'input
             text_surface = font.render(username, True, 'black')
             screen.blit(text_surface, (input_box.x + 5, input_box.y + 5))
 
             # Afficher le texte du bouton
             
-            button_text = font.render("Valider", True, 'black')
+            button_text = font.render("Valider", True, "black")
             text_width, text_height = font.size("Valider")
             text_x = button.x + (button.width - text_width) // 2
             text_y = button.y + (button.height - text_height) // 2
@@ -96,7 +104,7 @@ class Interface:
         clock = pygame.time.Clock()
         screen=pygame.display.set_mode((self.world['y_dim']+250, self.world['x_dim']))
         list_fishs=self.instanciation_fish(self.request.get("food"),screen)
-        font=pygame.font.Font(None, 36)
+        font=pygame.font.Font(None, 26)
         # Init players (we draw local_player)
         self.instanciation_player(screen,username)
         self.local_player.draw(screen,"dark")
@@ -142,7 +150,7 @@ class Interface:
                     keys = pygame.key.get_pressed()
                     if any(key !=0 for key in keys):
                         movement = Movement(player.get_pos_x(),player.get_pos_y(),pygame,self.request,player.get_id())
-                        movement.move(clock.tick(120) / 1000,keys)
+                        movement.move(clock.tick(60) / 1000,keys)
                         
                 # We draw the player
                     if(movement!=None):
@@ -160,7 +168,7 @@ class Interface:
             
             # Flip
             pygame.display.flip()
-            clock.tick(120)
+            clock.tick(60)
         self.request.close()
         pygame.quit()
         
