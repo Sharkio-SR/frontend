@@ -1,6 +1,7 @@
 # Autor: LE TARNEC Thomas, MOLINIER Camille
 import pygame
 import random
+from math import sqrt, pow
 from Action.movement import Movement
 from Entities.player import Player
 from Entities.fish import Fish
@@ -8,6 +9,12 @@ from Requests.request import Request
 import json
 
 class Interface:
+    
+    def sound_food(self,foods,player):
+        for food in foods:
+            distfood=sqrt(pow((player.get_pos_x()-food['pos_x']),2)+pow((player.get_pos_y()-food['pos_y']),2))
+            if distfood<11:
+                pygame.mixer.Sound("src/Music/musicmiam.mp3").play()
     
     def instanciation_player(self,screen,username):
         initplayer = self.request.post("world/join", {"name": username})
@@ -28,10 +35,9 @@ class Interface:
         y=50
         list_scores=sorted(scores,key=lambda x: x[2], reverse=True)[:10]    # We only display the 10 first scores
         for score in list_scores:
-            text_surface = font.render(f"Joueur {score[1]} : {score[2]}", True, "black")
+            text_surface = font.render(f" {score[1]} : {score[2]}", True, (211,211,211))
             screen.blit(text_surface, (630, y))
             y += 30
-            
     
     def popup_username(self):
         # This function create a popup to ask the username of the player
@@ -88,7 +94,7 @@ class Interface:
     def game(self,username):
         pygame.init()
         clock = pygame.time.Clock()
-        screen=pygame.display.set_mode((self.world['y_dim']+250, self.world['x_dim']+50))
+        screen=pygame.display.set_mode((self.world['y_dim']+250, self.world['x_dim']))
         list_fishs=self.instanciation_fish(self.request.get("food"),screen)
         font=pygame.font.Font(None, 36)
         # Init players (we draw local_player)
@@ -97,6 +103,10 @@ class Interface:
         running=True
         background_image = pygame.image.load("src/Images/background.png")
         background_image = pygame.transform.scale(background_image, (600, 600))
+        movement=None
+        music_path = "src/Music/musicshark.mp3"  # Remplacez "music.mp3" par le chemin de votre fichier audio
+        pygame.mixer.music.load(music_path)
+        pygame.mixer.music.play(-1)
         while running:
             # Events
             # pygame.QUIT event means the user clicked X to close your window
@@ -106,7 +116,7 @@ class Interface:
                     running = False
 
             # Update
-            screen.fill("grey")
+            screen.fill((56,62,66))
             screen.blit(background_image, (0, 0))
             
             # Update the food and draw it
@@ -128,7 +138,7 @@ class Interface:
                         self.local_player.pos_x=player.get_pos_x()
                         self.local_player.pos_y=player.get_pos_y()
                 # We move the player
-                    movement=None
+                    
                     keys = pygame.key.get_pressed()
                     if any(key !=0 for key in keys):
                         movement = Movement(player.get_pos_x(),player.get_pos_y(),pygame,self.request,player.get_id())
@@ -136,6 +146,7 @@ class Interface:
                         
                 # We draw the player
                     if(movement!=None):
+                        self.sound_food(foods,player)
                         player.draw(screen,"blue",movement.reverse)
                     else:
                         player.draw(screen,"blue")
