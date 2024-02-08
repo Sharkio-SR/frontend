@@ -153,7 +153,7 @@ class Interface:
                     keys = pygame.key.get_pressed()
                     if any(key !=0 for key in keys):
                         movement = Movement(player.get_pos_x(),player.get_pos_y(),pygame,self.request,player.get_id())
-                        movement.move(clock.tick(60) / 1000,keys)
+                        movement.move(keys)
                         
                 # We draw the player
                     if(movement!=None):
