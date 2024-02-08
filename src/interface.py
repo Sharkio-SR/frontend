@@ -6,6 +6,8 @@ from Action.movement import Movement
 from Entities.player import Player
 from Entities.fish import Fish
 from Requests.request import Request
+import os
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (200,45)
 import json
 
 class Interface:
@@ -101,6 +103,7 @@ class Interface:
     
     def game(self,username):
         pygame.init()
+        screen_info = pygame.display.Info()
         clock = pygame.time.Clock()
         screen=pygame.display.set_mode((self.world['y_dim']+250, self.world['x_dim']))
         list_fishs=self.instanciation_fish(self.request.get("food"),screen)
