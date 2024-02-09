@@ -44,9 +44,8 @@ class Interface:
     
     def instanciation_mine(self,screen):
         # This function instanciate the fishs and put it in a list to save their images
-        #mines = request.get("mine")
+        mines = self.request.get("mine")
         List_mine=[]
-        mines=[{"id":1,"pos_x":100,"pos_y":100}]
         for mine in mines:
             mine = Mine(mine['id'],mine['pos_x'],mine['pos_y'],pygame,self.request,screen)
             List_mine.append(mine)
@@ -205,8 +204,7 @@ class Interface:
 
                 #Update the mines and draw it
                 
-                #mines=self.request.get("mine")
-                dangers=[{"id":1,"pos_x":100,"pos_y":100}]
+                dangers=self.request.get("mine")
                 for danger in dangers:
                     next(filter(lambda mine: mine.id_mine == danger['id'], self.list_mines), None).draw()
                  
