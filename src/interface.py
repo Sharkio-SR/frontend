@@ -34,11 +34,23 @@ class Interface:
     
     def function_listscores(self,scores,font,screen): 
         # We sort the list of score
-        y=50
+        y=100
         list_scores=sorted(scores,key=lambda x: x[2], reverse=True)[:10]    # We only display the 10 first scores
-        for score in list_scores:
+        for i, score in enumerate(list_scores[:3]):
+            if(i==0):
+                img_first = pygame.image.load("src/Images/Algue1.png")
+                img_first = pygame.transform.scale(img_first, (20, 20))
+                screen.blit(img_first, (630, y))
+            elif(i==1):
+                img_second = pygame.image.load("src/Images/Algue2.png")
+                img_second = pygame.transform.scale(img_second, (20, 20))
+                screen.blit(img_second, (630, y))
+            elif(i==2):
+                img_third = pygame.image.load("src/Images/Algue3.png")
+                img_third = pygame.transform.scale(img_third, (20, 20))
+                screen.blit(img_third, (630, y))
             text_surface = font.render(f" {score[1]} : {score[2]}", True, (211,211,211))
-            screen.blit(text_surface, (630, y))
+            screen.blit(text_surface, (650, y))
             y += 30
     
     def popup_username(self):
@@ -72,7 +84,8 @@ class Interface:
                     elif event.key == pygame.K_BACKSPACE:
                         username = username[:-1]
                     else:
-                        username += event.unicode
+                        if len(username) < 15:
+                            username += event.unicode
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     if button.collidepoint(event.pos):
                         return username
@@ -166,6 +179,10 @@ class Interface:
                 # We delete the player instance
                 del player
             
+            # We draw the title
+            font_title=pygame.font.Font("src/Aquatico-Regular.otf", 40)
+            text_surface = font_title.render("SHARKIO", True, (211,211,211))
+            screen.blit(text_surface, (630, 30))
             # We draw the score
             self.function_listscores(scores,font,screen)
             
