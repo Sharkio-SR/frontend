@@ -5,6 +5,7 @@ from math import sqrt, pow
 from Action.movement import Movement
 from Entities.player import Player
 from Entities.fish import Fish
+from Entities.mine import Mine
 from Requests.request import Request
 import os
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (200,45)
@@ -13,12 +14,21 @@ import json
 class Interface:
     
     def sound_food(self,foods,player):
+        # This function play a sound when the player eat a fish
         for food in foods:
             distfood=sqrt(pow((player.get_pos_x()-food['pos_x']),2)+pow((player.get_pos_y()-food['pos_y']),2))
-            if distfood<11:
+            if distfood<12:
                 pygame.mixer.Sound("src/Music/musicmiam.mp3").play()
+                
+    def sounf_mine(self,mines,player):
+        # This function play a sound when the player eat a mines
+        for mine in mines:
+            distmine=sqrt(pow((player.get_pos_x()-mine['pos_x']),2)+pow((player.get_pos_y()-mine['pos_y']),2))
+            if distmine<12:
+                pygame.mixer.Sound("src/Music/explosion2.wav").play()
     
     def instanciation_player(self,screen,username):
+        # This function instanciate the player and put it in a list to save their images
         initplayer = self.request.post("world/join", {"name": username})
         self.local_player = Player(initplayer['id'], initplayer['pos_x'], initplayer['pos_y'], username, pygame, self.request, screen)
          
@@ -31,6 +41,16 @@ class Interface:
             fish = Fish(fish['id'],fish['pos_x'],fish['pos_y'],images[random.randint(0,7)],pygame,screen)
             List_fish.append(fish)
         return List_fish
+    
+    def instanciation_mine(self,screen):
+        # This function instanciate the fishs and put it in a list to save their images
+        #mines = request.get("mine")
+        List_mine=[]
+        mines=[{"id":1,"pos_x":100,"pos_y":100}]
+        for mine in mines:
+            mine = Mine(mine['id'],mine['pos_x'],mine['pos_y'],pygame,self.request,screen)
+            List_mine.append(mine)
+        return List_mine
     
     def function_listscores(self,scores,font,screen): 
         # We sort the list of score
@@ -71,6 +91,7 @@ class Interface:
                 if button.collidepoint(event.pos):
                     self.instanciation_player(screen,self.local_player.name)
                     self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
+                    self.list_mines=self.instanciation_mine(screen,self.request,pygame)
         # Dessiner la bordure du bouton en noir
         pygame.draw.rect(screen, (0, 0, 0), button, 2)
         # Remplir l'intérieur du bouton en blanc
@@ -149,6 +170,7 @@ class Interface:
         clock = pygame.time.Clock()
         screen=pygame.display.set_mode((self.world['y_dim']+250, self.world['x_dim']))
         self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
+        self.list_mines=self.instanciation_mine(screen)
         font=pygame.font.Font(None, 26)
         # Init players (we draw local_player)
         self.instanciation_player(screen,username)
@@ -180,7 +202,14 @@ class Interface:
                 foods=self.request.get("food")
                 for food in foods:
                     next(filter(lambda fish: fish.id_fish == food['id'], self.list_fishs), None).draw()
+
+                #Update the mines and draw it
                 
+                #mines=self.request.get("mine")
+                dangers=[{"id":1,"pos_x":100,"pos_y":100}]
+                for danger in dangers:
+                    next(filter(lambda mine: mine.id_mine == danger['id'], self.list_mines), None).draw()
+                 
                 scores=[]
                 #Update and check roleback
                 players = self.request.get("player")
@@ -204,6 +233,7 @@ class Interface:
                     # We draw the player
                         if(movement!=None):
                             self.sound_food(foods,player)
+                            self.sounf_mine(dangers,player)
                             player.draw(screen,"blue",movement.reverse)
                         else:
                             player.draw(screen,"blue")
@@ -241,6 +271,7 @@ class Interface:
         self.world=self.request.get("world")
         self.local_player = None
         self.list_fishs = None
+        self.list_mines = None
 
     
     def run(self):
