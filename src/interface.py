@@ -36,7 +36,10 @@ class Interface:
         # We sort the list of score
         y=100
         list_scores=sorted(scores,key=lambda x: x[2], reverse=True)[:10]    # We only display the 10 first scores
-        for i, score in enumerate(list_scores[:3]):
+        local_player_found=False
+        for i, score in enumerate(list_scores[:10]):
+            if(score[1]==self.local_player.name):
+                local_player_found=True
             if(i==0):
                 img_first = pygame.image.load("src/Images/Algue1.png")
                 img_first = pygame.transform.scale(img_first, (20, 20))
@@ -52,6 +55,32 @@ class Interface:
             text_surface = font.render(f" {score[1]} : {score[2]}", True, (211,211,211))
             screen.blit(text_surface, (650, y))
             y += 30
+        if not local_player_found:
+            text_surface = font.render(f"Local Player: {local_player_score}", True, (211, 211, 211))
+            screen.blit(text_surface, (650, y))
+    
+    def screen_end(self,screen,events):
+        # This function draw the end screen
+        font=pygame.font.Font(None, 26)
+        font_title=pygame.font.Font("src/Aquatico-Regular.otf", 40)
+        text_surface = font.render("GAME OVER", True, (211,211,211))
+        screen.blit(text_surface, (675, 450))
+        button = pygame.Rect(675, 500, 100, 50)
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if button.collidepoint(event.pos):
+                    self.instanciation_player(screen,self.local_player.name)
+                    self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
+        # Dessiner la bordure du bouton en noir
+        pygame.draw.rect(screen, (0, 0, 0), button, 2)
+        # Remplir l'intérieur du bouton en blanc
+        pygame.draw.rect(screen, (211,211,211), button)
+        button_text = font.render("Restart", True, "black")
+        text_width, text_height = font.size("Restart")
+        text_x = button.x + (button.width - text_width) // 2
+        text_y = button.y + (button.height - text_height) // 2
+        screen.blit(button_text, (text_x, text_y))
+        
     
     def popup_username(self):
         # This function create a popup to ask the username of the player
@@ -119,7 +148,7 @@ class Interface:
         screen_info = pygame.display.Info()
         clock = pygame.time.Clock()
         screen=pygame.display.set_mode((self.world['y_dim']+250, self.world['x_dim']))
-        list_fishs=self.instanciation_fish(self.request.get("food"),screen)
+        self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
         font=pygame.font.Font(None, 26)
         # Init players (we draw local_player)
         self.instanciation_player(screen,username)
@@ -131,60 +160,69 @@ class Interface:
         music_path = "src/Music/musicshark.mp3"  # Remplacez "music.mp3" par le chemin de votre fichier audio
         pygame.mixer.music.load(music_path)
         pygame.mixer.music.play(-1)
+        previous_score=[]
         while running:
             # Events
             # pygame.QUIT event means the user clicked X to close your window
-            for event in pygame.event.get():
+            events = pygame.event.get()
+            for event in events:
                 if event.type == pygame.QUIT:
                     self.request.delete("player/"+str(self.local_player.get_id()))
                     running = False
-
-            # Update
+            # We get the state of the game
             screen.fill((56,62,66))
             screen.blit(background_image, (0, 0))
-            
-            # Update the food and draw it
-            foods=self.request.get("food")
-            for food in foods:
-                next(filter(lambda fish: fish.id_fish == food['id'], list_fishs), None).draw()
-            
-            scores=[]
-            #Update and check roleback
-            players = self.request.get("player")
-            for player in players:
-                scores.append([player['id'],player['name'],player['score']])
-                player = Player(player['id'],player['pos_x'],player['pos_y'],player['name'],pygame,self.request,screen)       
-                # We check if the player is the local player
-                if player.get_id() == self.local_player.get_id():
-                    # We check if the position of the player is the same as the local player
-                    # If not, it means that the server has rollback the player
-                    if player.get_pos_x() != self.local_player.get_pos_x() or player.get_pos_y() != self.local_player.get_pos_y():
-                        self.local_player.pos_x=player.get_pos_x()
-                        self.local_player.pos_y=player.get_pos_y()
-                # We move the player
-                    
-                    keys = pygame.key.get_pressed()
-                    if any(key !=0 for key in keys):
-                        movement = Movement(player.get_pos_x(),player.get_pos_y(),pygame,self.request,player.get_id())
-                        movement.move(keys)
+            state=self.request.get("world/state")
+            if(state):
+                # The game is running
+                
+                # Update the food and draw it
+                foods=self.request.get("food")
+                for food in foods:
+                    next(filter(lambda fish: fish.id_fish == food['id'], self.list_fishs), None).draw()
+                
+                scores=[]
+                #Update and check roleback
+                players = self.request.get("player")
+                for player in players:
+                    scores.append([player['id'],player['name'],player['score']])
+                    player = Player(player['id'],player['pos_x'],player['pos_y'],player['name'],pygame,self.request,screen)       
+                    # We check if the player is the local player
+                    if player.get_id() == self.local_player.get_id():
+                        # We check if the position of the player is the same as the local player
+                        # If not, it means that the server has rollback the player
+                        if player.get_pos_x() != self.local_player.get_pos_x() or player.get_pos_y() != self.local_player.get_pos_y():
+                            self.local_player.pos_x=player.get_pos_x()
+                            self.local_player.pos_y=player.get_pos_y()
+                    # We move the player
                         
-                # We draw the player
-                    if(movement!=None):
-                        self.sound_food(foods,player)
-                        player.draw(screen,"blue",movement.reverse)
+                        keys = pygame.key.get_pressed()
+                        if any(key !=0 for key in keys):
+                            movement = Movement(player.get_pos_x(),player.get_pos_y(),pygame,self.request,player.get_id())
+                            movement.move(keys)
+                            
+                    # We draw the player
+                        if(movement!=None):
+                            self.sound_food(foods,player)
+                            player.draw(screen,"blue",movement.reverse)
+                        else:
+                            player.draw(screen,"blue")
                     else:
-                        player.draw(screen,"blue")
-                else:
-                    player.draw(screen)
-                # We delete the player instance
-                del player
-            
+                        player.draw(screen)
+                    # We delete the player instance
+                    del player
+                previous_score=scores
+                
+            else:
+                #The game is over
+                # We draw the end screen
+                end_screen=self.screen_end(screen,events)
+            # We draw the score
+            self.function_listscores(previous_score,font,screen)
             # We draw the title
             font_title=pygame.font.Font("src/Aquatico-Regular.otf", 40)
             text_surface = font_title.render("SHARKIO", True, (211,211,211))
             screen.blit(text_surface, (630, 30))
-            # We draw the score
-            self.function_listscores(scores,font,screen)
             
             # Flip
             pygame.display.flip()
@@ -202,6 +240,7 @@ class Interface:
         self.clock = pygame.time.Clock()
         self.world=self.request.get("world")
         self.local_player = None
+        self.list_fishs = None
 
     
     def run(self):
