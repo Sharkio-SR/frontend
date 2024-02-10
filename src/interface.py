@@ -108,7 +108,7 @@ class Interface:
                 if button.collidepoint(event.pos):
                     self.instanciation_player(screen,self.local_player.name)
                     self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
-                    self.list_mines=self.instanciation_mine(screen,self.request,pygame)
+                    self.list_mines=self.instanciation_mine(screen)
         # Drawn the boarder of the button in black
         pygame.draw.rect(screen, (0, 0, 0), button, 2)
         # Fill the inside of the button in white
