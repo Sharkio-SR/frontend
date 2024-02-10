@@ -5,6 +5,7 @@ from math import sqrt, pow
 from Action.movement import Movement
 from Entities.player import Player
 from Entities.fish import Fish
+from Entities.mine import Mine
 from Requests.request import Request
 import os
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (200,45)
@@ -12,18 +13,27 @@ import json
 
 class Interface:
     
-    def sound_food(self,foods,player):
+    def sound_food(self, foods, player):
+        # This function play a sound when the player eat a fish
         for food in foods:
             distfood=sqrt(pow((player.get_pos_x()-food['pos_x']),2)+pow((player.get_pos_y()-food['pos_y']),2))
-            if distfood<11:
+            if distfood<12:
                 pygame.mixer.Sound("src/Music/musicmiam.mp3").play()
+                
+    def sounf_mine(self, mines, player):
+        # This function play a sound when the player eat a mines
+        for mine in mines:
+            distmine=sqrt(pow((player.get_pos_x()-mine['pos_x']),2)+pow((player.get_pos_y()-mine['pos_y']),2))
+            if distmine<12:
+                pygame.mixer.Sound("src/Music/explosion2.wav").play()
     
-    def instanciation_player(self,screen,username):
+    def instanciation_player(self, screen, username):
+        # This function instanciate the player and put it in a list to save their images
         initplayer = self.request.post("world/join", {"name": username})
         self.local_player = Player(initplayer['id'], initplayer['pos_x'], initplayer['pos_y'], username, pygame, self.request, screen)
          
     
-    def instanciation_fish(self,fishs,screen):
+    def instanciation_fish(self, fishs, screen):
         # This function instanciate the fishs and put it in a list to save their images
         List_fish=[]
         images=["fish1.png","fish2.png","fish3.png","fish4.png","fish5.png","fish6.png","fish7.png","fish8.png"]
@@ -31,6 +41,26 @@ class Interface:
             fish = Fish(fish['id'],fish['pos_x'],fish['pos_y'],images[random.randint(0,7)],pygame,screen)
             List_fish.append(fish)
         return List_fish
+    
+    def draw_fish(self, screen, fishs):
+        for fish in fishs:
+            if not any(f.id_fish == fish['id'] for f in self.list_fishs):
+                self.list_fishs.append(Fish(fish['id'],fish['pos_x'],fish['pos_y'],self.random_image(),pygame,screen))
+            next(filter(lambda f: f.id_fish == fish['id'], self.list_fishs), None).draw()
+
+    def random_image(self):
+        # This function return a random image for the fish
+        images=["fish1.png","fish2.png","fish3.png","fish4.png","fish5.png","fish6.png","fish7.png","fish8.png"]
+        return images[random.randint(0,7)]
+    
+    def instanciation_mine(self, screen):
+        # This function instanciate the fishs and put it in a list to save their images
+        mines = self.request.get("mine")
+        List_mine=[]
+        for mine in mines:
+            mine = Mine(mine['id'],mine['pos_x'],mine['pos_y'],pygame,self.request,screen)
+            List_mine.append(mine)
+        return List_mine
     
     def function_listscores(self,scores,font,screen): 
         # We sort the list of score
@@ -71,9 +101,10 @@ class Interface:
                 if button.collidepoint(event.pos):
                     self.instanciation_player(screen,self.local_player.name)
                     self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
-        # Dessiner la bordure du bouton en noir
+                    self.list_mines=self.instanciation_mine(screen,self.request,pygame)
+        # Drawn the boarder of the button in black
         pygame.draw.rect(screen, (0, 0, 0), button, 2)
-        # Remplir l'intérieur du bouton en blanc
+        # Fill the inside of the button in white
         pygame.draw.rect(screen, (211,211,211), button)
         button_text = font.render("Restart", True, "black")
         text_width, text_height = font.size("Restart")
@@ -91,7 +122,7 @@ class Interface:
         pygame.display.set_caption("Enter Username")
         background_image = pygame.image.load("src/Images/Enter.png")
         background_image = pygame.transform.scale(background_image, (400, 200))
-        # Définition des constantes pour les dimensions et les positions des éléments
+        # Define the constants we need for the input box and button positions
         input_box = pygame.Rect(75, 50, 250, 30)
         button = pygame.Rect(150, 100, 100, 50)
         font = pygame.font.Font(None, 26)
@@ -119,19 +150,19 @@ class Interface:
                     if button.collidepoint(event.pos):
                         return username
             screen.blit(background_image, (0, 0))
-            # Dessiner la bordure de la zone d'input en noir
+            # Draw the border of the input box in black
             pygame.draw.rect(screen, (0, 0, 0), input_box, 2)
-            # Remplir l'intérieur de la zone d'input en blanc
+            # Fill the inside of the input box in white
             pygame.draw.rect(screen, (211,211,211), input_box)
-            # Dessiner la bordure du bouton en noir
+            # Draw the border of the button in black
             pygame.draw.rect(screen, (0, 0, 0), button, 2)
-            # Remplir l'intérieur du bouton en blanc
+            # Fill the inside of the button in white
             pygame.draw.rect(screen, (211,211,211), button)
-            # Afficher le texte saisi dans la zone d'input
+            # Print the username in the input box
             text_surface = font.render(username, True, 'black')
             screen.blit(text_surface, (input_box.x + 5, input_box.y + 5))
 
-            # Afficher le texte du bouton
+            # Print the button text
             
             button_text = font.render("Valider", True, "black")
             text_width, text_height = font.size("Valider")
@@ -149,6 +180,7 @@ class Interface:
         clock = pygame.time.Clock()
         screen=pygame.display.set_mode((self.world['y_dim']+250, self.world['x_dim']))
         self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
+        self.list_mines=self.instanciation_mine(screen)
         font=pygame.font.Font(None, 26)
         # Init players (we draw local_player)
         self.instanciation_player(screen,username)
@@ -157,7 +189,7 @@ class Interface:
         background_image = pygame.image.load("src/Images/background.png")
         background_image = pygame.transform.scale(background_image, (600, 600))
         movement=None
-        music_path = "src/Music/musicshark.mp3"  # Remplacez "music.mp3" par le chemin de votre fichier audio
+        music_path = "src/Music/musicshark.mp3"
         pygame.mixer.music.load(music_path)
         pygame.mixer.music.play(-1)
         previous_score=[]
@@ -178,9 +210,14 @@ class Interface:
                 
                 # Update the food and draw it
                 foods=self.request.get("food")
-                for food in foods:
-                    next(filter(lambda fish: fish.id_fish == food['id'], self.list_fishs), None).draw()
+                self.draw_fish(screen,foods)
+                #Update the mines and draw it
                 
+                dangers=self.request.get("mine")
+                for danger in dangers:
+                    Mine(danger['id'],danger['pos_x'],danger['pos_y'],pygame,self.request,screen).draw()
+                    
+                 
                 scores=[]
                 #Update and check roleback
                 players = self.request.get("player")
@@ -204,6 +241,7 @@ class Interface:
                     # We draw the player
                         if(movement!=None):
                             self.sound_food(foods,player)
+                            self.sounf_mine(dangers,player)
                             player.draw(screen,"blue",movement.reverse)
                         else:
                             player.draw(screen,"blue")
@@ -241,6 +279,7 @@ class Interface:
         self.world=self.request.get("world")
         self.local_player = None
         self.list_fishs = None
+        self.list_mines = None
 
     
     def run(self):

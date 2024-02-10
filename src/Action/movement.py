@@ -1,5 +1,5 @@
 class Movement:
-    def __init__(self, player_pos_x,player_pos_y, pygame_instance,request_instance,id_player):
+    def __init__(self, player_pos_x, player_pos_y, pygame_instance, request_instance, id_player):
         self.request_instance = request_instance
         self.reverse=False
         self.player_pos_x = player_pos_x
