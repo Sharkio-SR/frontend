@@ -1,11 +1,12 @@
 #Class for the player
 class Player:
-    def __init__(self, id,pos_x,pos_y, name, pygame_instance, request_instance, screen):
+    def __init__(self, id,pos_x,pos_y, name, score,pygame_instance, request_instance, screen):
         # We init the player with a position, a pygame instance and a request instance
         self.id_player = id
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.name = name
+        self.score=score
         self.pygame_instance = pygame_instance
         self.screen_instance=screen
         self.request_instance = request_instance
