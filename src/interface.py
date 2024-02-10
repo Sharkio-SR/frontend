@@ -58,9 +58,16 @@ class Interface:
         mines = self.request.get("mine")
         List_mine=[]
         for mine in mines:
-            mine = Mine(mine['id'],mine['pos_x'],mine['pos_y'],pygame,self.request,screen)
+            mine = Mine(mine['id'],mine['pos_x'],mine['pos_y'],pygame,screen)
             List_mine.append(mine)
         return List_mine
+    
+    def draw_mines(self, screen, mines):
+        for danger in mines:
+            if not any(f.id_mine == danger['id'] for f in self.list_mines):
+                self.list_mines.append(Mine(danger['id'],danger['pos_x'],danger['pos_y'],pygame,screen))
+            next(filter(lambda f: f.id_mine == danger['id'], self.list_mines), None).draw()
+
     
     def function_listscores(self,scores,font,screen): 
         # We sort the list of score
@@ -213,10 +220,8 @@ class Interface:
                 self.draw_fish(screen,foods)
                 #Update the mines and draw it
                 
-                dangers=self.request.get("mine")
-                for danger in dangers:
-                    Mine(danger['id'],danger['pos_x'],danger['pos_y'],pygame,self.request,screen).draw()
-                    
+                mines=self.request.get("mine")
+                self.draw_mines(screen,mines)   
                  
                 scores=[]
                 #Update and check roleback
@@ -240,8 +245,6 @@ class Interface:
                             
                     # We draw the player
                         if(movement!=None):
-                            self.sound_food(foods,player)
-                            self.sounf_mine(dangers,player)
                             player.draw(screen,"blue",movement.reverse)
                         else:
                             player.draw(screen,"blue")

@@ -4,13 +4,12 @@ import random
 
 class Mine:
     
-    def __init__(self, id, pos_x, pos_y, pygame, request, screen):
+    def __init__(self, id, pos_x, pos_y, pygame, screen):
         self.id_mine= id
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.pygame_instance = pygame
         self.screen_instance=screen
-        self.request_instance = request
         self.image_mine = self.pygame_instance.image.load("src/Images/mines.png")
         self.image_mine = self.pygame_instance.transform.scale(self.image_mine, (20, 20))
     
