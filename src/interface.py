@@ -30,7 +30,7 @@ class Interface:
     def instanciation_player(self, screen, username):
         # This function instanciate the player and put it in a list to save their images
         initplayer = self.request.post("world/join", {"name": username})
-        self.local_player = Player(initplayer['id'], initplayer['pos_x'], initplayer['pos_y'], username, pygame, self.request, screen)
+        self.local_player = Player(initplayer['id'], initplayer['pos_x'], initplayer['pos_y'],initplayer['score'], username, pygame, self.request, screen)
          
     
     def instanciation_fish(self, fishs, screen):
@@ -75,7 +75,7 @@ class Interface:
         list_scores=sorted(scores,key=lambda x: x[2], reverse=True)[:10]    # We only display the 10 first scores
         local_player_found=False
         for i, score in enumerate(list_scores[:10]):
-            if(score[1]==self.local_player.name):
+            if(score[1]==self.name):
                 local_player_found=True
             if(i==0):
                 img_first = pygame.image.load("src/Images/Algue1.png")
@@ -93,7 +93,7 @@ class Interface:
             screen.blit(text_surface, (650, y))
             y += 30
         if not local_player_found:
-            text_surface = font.render(f"Local Player: {local_player_score}", True, (211, 211, 211))
+            text_surface = font.render(f"Local Player: {self.local_player_score}", True, (211, 211, 211))
             screen.blit(text_surface, (650, y))
     
     def screen_end(self,screen,events):
@@ -106,9 +106,10 @@ class Interface:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button.collidepoint(event.pos):
-                    self.instanciation_player(screen,self.local_player.name)
+                    print(self.name)
+                    self.instanciation_player(screen,self.name)
                     self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
-                    self.list_mines=self.instanciation_mine(screen,self.request,pygame)
+                    self.list_mines=self.instanciation_mine(screen)
         # Drawn the boarder of the button in black
         pygame.draw.rect(screen, (0, 0, 0), button, 2)
         # Fill the inside of the button in white
@@ -228,11 +229,12 @@ class Interface:
                 players = self.request.get("player")
                 for player in players:
                     scores.append([player['id'],player['name'],player['score']])
-                    player = Player(player['id'],player['pos_x'],player['pos_y'],player['name'],pygame,self.request,screen)       
+                    player = Player(player['id'],player['pos_x'],player['pos_y'],player['name'],player['score'],pygame,self.request,screen)       
                     # We check if the player is the local player
                     if player.get_id() == self.local_player.get_id():
                         # We check if the position of the player is the same as the local player
                         # If not, it means that the server has rollback the player
+                        self.local_player_score=player.score
                         if player.get_pos_x() != self.local_player.get_pos_x() or player.get_pos_y() != self.local_player.get_pos_y():
                             self.local_player.pos_x=player.get_pos_x()
                             self.local_player.pos_y=player.get_pos_y()
@@ -283,11 +285,14 @@ class Interface:
         self.local_player = None
         self.list_fishs = None
         self.list_mines = None
+        self.name=None
+        self.local_player_score=0
 
     
     def run(self):
         username = self.popup_username()
         if(username!=None):
+            self.name=username
             self.game(username)
         else:
             self.request.close()
