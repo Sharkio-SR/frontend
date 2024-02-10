@@ -75,7 +75,7 @@ class Interface:
         list_scores=sorted(scores,key=lambda x: x[2], reverse=True)[:10]    # We only display the 10 first scores
         local_player_found=False
         for i, score in enumerate(list_scores[:10]):
-            if(score[1]==self.local_player.name):
+            if(score[1]==self.name):
                 local_player_found=True
             if(i==0):
                 img_first = pygame.image.load("src/Images/Algue1.png")
@@ -96,7 +96,7 @@ class Interface:
             text_surface = font.render(f"Local Player: {self.local_player_score}", True, (211, 211, 211))
             screen.blit(text_surface, (650, y))
     
-    def screen_end(self,screen,events,name):
+    def screen_end(self,screen,events):
         # This function draw the end screen
         font=pygame.font.Font(None, 26)
         font_title=pygame.font.Font("src/Aquatico-Regular.otf", 40)
@@ -106,7 +106,7 @@ class Interface:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button.collidepoint(event.pos):
-                    print(name)
+                    print(self.name)
                     self.instanciation_player(screen,self.name)
                     self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
                     self.list_mines=self.instanciation_mine(screen)
