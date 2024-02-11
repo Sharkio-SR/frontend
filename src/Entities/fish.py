@@ -20,10 +20,6 @@ class Fish:
         #self.fish_rect.y = self.pos_y
         self.screen_instance.blit(self.image_fish,(self.pos_x-10,self.pos_y-10))
     
-    def draw_circle(self, color):
-        # We draw a circle around the fish
-        self.pygame_instance.draw.circle(self.screen_instance, color, (self.pos_x, self.pos_y), 10, 2)
-    
     def find_fish_by_id(fish_list, target_id):
         for fish in fish_list:
             if fish.id == target_id:
