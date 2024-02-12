@@ -96,20 +96,25 @@ class Interface:
             text_surface = font.render(f"Local Player: {self.local_player_score}", True, (211, 211, 211))
             screen.blit(text_surface, (650, y))
     
-    def screen_end(self,screen,events):
+    def screen_end(self,screen,events,scores):
         # This function draw the end screen
+        self.local_player=None
         font=pygame.font.Font(None, 26)
         font_title=pygame.font.Font("src/Aquatico-Regular.otf", 40)
-        text_surface = font.render("GAME OVER", True, (211,211,211))
-        screen.blit(text_surface, (675, 450))
         button = pygame.Rect(675, 500, 100, 50)
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button.collidepoint(event.pos):
-                    print(self.name)
                     self.instanciation_player(screen,self.name)
                     self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
                     self.list_mines=self.instanciation_mine(screen)
+        list_scores=sorted(scores,key=lambda x: x[2], reverse=True)[:10]
+        if(list_scores[0][1]==self.name):
+            text_surface = font.render(f"YOU WIN", True, (211,211,211))
+            screen.blit(text_surface, (685, 450))
+        else:
+            text_surface = font.render(f"YOU LOOSE", True, (211,211,211))
+            screen.blit(text_surface, (685, 450))
         # Drawn the boarder of the button in black
         pygame.draw.rect(screen, (0, 0, 0), button, 2)
         # Fill the inside of the button in white
@@ -213,7 +218,7 @@ class Interface:
             screen.fill((56,62,66))
             screen.blit(background_image, (0, 0))
             state=self.request.get("world/state")
-            if(state):
+            if(state and self.local_player!=None):
                 # The game is running
                 
                 # Update the food and draw it
@@ -259,7 +264,7 @@ class Interface:
             else:
                 #The game is over
                 # We draw the end screen
-                end_screen=self.screen_end(screen,events)
+                end_screen=self.screen_end(screen,events,previous_score)
             # We draw the score
             self.function_listscores(previous_score,font,screen)
             # We draw the title

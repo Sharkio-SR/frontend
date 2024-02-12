@@ -1,6 +1,5 @@
 #Class Fish 
-#Cette classe permet d'instancier les poissons qui symbolise la nourriture/score pour les joueurs
-import random
+# This class allows to instantiate the mines which symbolize the danger for the players
 
 class Mine:
     
@@ -15,9 +14,6 @@ class Mine:
     
     
     def draw(self):
-        # We draw the fish on the screen
-        #self.fish_rect=self.image_fish.get_rect()
-        #self.fish_rect.x = self.pos_x
-        #self.fish_rect.y = self.pos_y
+        # We draw the mine on the screen
         self.screen_instance.blit(self.image_mine,(self.pos_x-10,self.pos_y-10))
         
