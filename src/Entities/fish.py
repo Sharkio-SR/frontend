@@ -15,9 +15,6 @@ class Fish:
     
     def draw(self):
         # We draw the fish on the screen
-        #self.fish_rect=self.image_fish.get_rect()
-        #self.fish_rect.x = self.pos_x
-        #self.fish_rect.y = self.pos_y
         self.screen_instance.blit(self.image_fish,(self.pos_x-10,self.pos_y-10))
     
     def find_fish_by_id(fish_list, target_id):
