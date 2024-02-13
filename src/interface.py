@@ -106,6 +106,8 @@ class Interface:
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if button.collidepoint(event.pos):
                     self.instanciation_player(screen,self.name)
+                    self.list_fishs=[]
+                    self.list_mines=[]
                     self.list_fishs=self.instanciation_fish(self.request.get("food"),screen)
                     self.list_mines=self.instanciation_mine(screen)
         list_scores=sorted(scores,key=lambda x: x[2], reverse=True)[:10]
